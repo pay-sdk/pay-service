@@ -6,5 +6,5 @@ public interface UserService {
 
     User save(User user);
 
-    User findByToken(String token);
+    User findByTelegramId(String telegramId);
 }

@@ -4,37 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Data
 @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table(name = "payments")
-public class Payment {
+//@Table(name = "projects")
+public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String username;
+    private String name;
 
-    private String description;
-
-    private Double moneyAmount;
-
-    @Type(type="date")
-    private Date purchaseDate;
+    private String token;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-    @PrePersist
-    void purchaseDate() {
-        this.purchaseDate = new Date();
-    }
 }

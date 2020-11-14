@@ -1,4 +1,4 @@
-package org.paysdk.pay.models;
+package org.paysdk.pay.dto;
 
 import lombok.Builder;
 import lombok.Data;

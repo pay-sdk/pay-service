@@ -1,4 +1,4 @@
-package org.paysdk.pay.util.convertors;
+package org.paysdk.pay.util;
 
 import java.security.SecureRandom;
 import java.util.Locale;
