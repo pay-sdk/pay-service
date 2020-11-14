@@ -2,7 +2,6 @@ package org.paysdk.pay.models;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,10 +17,12 @@ public class User {
 
     private String telegramId;
 
-    private String merchnedId;
+    private String token;
+
+    private String merchantId;
 
     private String secretKey;
 
-    @OneToMany
-    private List<Payment> payment;
+//    @OneToMany
+//    private List<Payment> payment;
 }

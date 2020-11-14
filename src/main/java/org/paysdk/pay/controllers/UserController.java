@@ -2,13 +2,14 @@ package org.paysdk.pay.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.paysdk.pay.models.User;
+import org.paysdk.pay.models.UserRequest;
 import org.paysdk.pay.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.paysdk.pay.util.convertors.UserConvertor.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -18,9 +19,9 @@ public class UserController {
     @Autowired
     private final UserService userService;
 
-    @GetMapping
-    @Deprecated
-    public List<User> getAllUsers() {
-        return userService.findAll();
+    @PostMapping()
+    private String register(@RequestBody UserRequest userRequest) {
+        User savedUser = userService.save(convert(userRequest));
+        return savedUser.getToken();
     }
 }
