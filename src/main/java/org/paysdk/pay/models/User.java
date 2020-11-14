@@ -1,13 +1,14 @@
 package org.paysdk.pay.models;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
+import java.util.List;
 
 @Data
+@Builder
 @Entity
 public class User {
 
@@ -15,9 +16,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String username;
+    private String telegramId;
 
-    private String password;
+    private String merchnedId;
 
-    private String inGameId;
+    private String secretKey;
+
+    @OneToMany
+    private List<Payment> payment;
 }
