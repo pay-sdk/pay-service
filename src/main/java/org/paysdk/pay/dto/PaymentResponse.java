@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PaymentRequest {
-
-    private String token;
+public class PaymentResponse {
 
     private String username;
 

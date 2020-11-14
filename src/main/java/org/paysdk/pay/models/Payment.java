@@ -14,7 +14,6 @@ import java.util.Date;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table(name = "payments")
 public class Payment {
 
     @Id
@@ -31,7 +30,7 @@ public class Payment {
     private Date purchaseDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Project project;
 
     @PrePersist
     void purchaseDate() {

@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@Table(name = "projects")
 public class Project {
 
     @Id

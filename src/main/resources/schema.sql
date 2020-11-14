@@ -16,8 +16,8 @@ create table if not exists Payment (
 id identity,
 username varchar(50) not null,
 description varchar(200) not null,
-moneyAmount double not null,
+moneyAmount DOUBLE not null,
 purchaseDate timestamp not null,
-userId long not null,
-foreign key (userId) references User(id)
+projectId long not null,
+foreign key (projectId) references Project(id)
 );
