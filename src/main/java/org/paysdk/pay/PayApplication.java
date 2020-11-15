@@ -12,6 +12,7 @@ import org.paysdk.pay.models.User;
 import org.paysdk.pay.services.ProjectService;
 import org.paysdk.pay.services.UserService;
 import org.paysdk.pay.services.realizations.MessageService;
+import org.paysdk.pay.util.BotUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +32,7 @@ public class PayApplication implements ApplicationRunner {
 	private final UserService userService;
 	private final ProjectService projectService;
 
-	private final TelegramBot bot = new TelegramBot("1417055143:AAEH2kYow1YW_VSble3_xFqJVQivjrOqk_w");
+	private final TelegramBot bot = BotUtil.bot;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PayApplication.class, args);
@@ -73,7 +74,7 @@ public class PayApplication implements ApplicationRunner {
 					}
 				});
 
-				return UpdatesListener.CONFIRMED_UPDATES_NONE;
+				return UpdatesListener.CONFIRMED_UPDATES_ALL;
 			});
 		} catch (Exception e) {
 			// ignore

@@ -15,7 +15,7 @@ public class NotifyUtil {
                         "Добро пожаловать, " + update.message().from().firstName() + "!"));
             });
 
-            return UpdatesListener.CONFIRMED_UPDATES_NONE;
+            return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
     }
 }
