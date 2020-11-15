@@ -7,8 +7,8 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.AllArgsConstructor;
-import org.paysdk.pay.dto.UserRequest;
 import org.paysdk.pay.models.User;
+import org.paysdk.pay.services.UserService;
 import org.paysdk.pay.services.realizations.MessageService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,6 +24,7 @@ public class PayApplication implements ApplicationRunner {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final MessageService messageService;
+	private final UserService userService;
 
 
 	public static void main(String[] args) {
@@ -40,13 +41,26 @@ public class PayApplication implements ApplicationRunner {
 
 			updates.forEach(update -> {
 
+				if (update.message() == null) return;
+
 				if (update.message().text().equals("/start")) {
 					bot.execute(new SendMessage(update.message().chat().id(),
 							"Добро пожаловать, " + update.message().from().firstName() + "!"));
 				} else {
-					processAddCommand(bot, update);
+					// reg
+					processRegisterCommand(bot, update);
+
+					// create developer
+					processAddDeveloperCommand(bot, update);
+
+					// project
+					processProjectCommand(bot, update);
+
+					// add project
+					processAddProjectCommand(bot, update);
+
+					// history
 					processHistoryCommand(bot, update);
-					processDeveloperCommand(bot, update);
 				}
 			});
 
@@ -57,8 +71,17 @@ public class PayApplication implements ApplicationRunner {
 
 	}
 
-	private void processAddCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
-		if (update.message().text().equals("/add")) {
+	private void processAddProjectCommand(TelegramBot bot, Update update) {
+		if (update.message().text().startsWith("project")) {
+			bot.execute(new SendMessage(update.message().chat().id(),
+					"Проект готов.\n" +
+							"Ваш токен:\n\n" +
+                            "<b>KLjdi89REb3894Fdbb8KJEosfd3f3Ie4</b>").parseMode(ParseMode.HTML));
+		}
+	}
+
+	private void processRegisterCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
+		if (update.message().text().equals("/reg")) {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Для того, чтобы зарегистрировать нового разработчика, отправьте " +
 							"следующее сообщение с тремя элементами:\n\n" +
@@ -70,14 +93,14 @@ public class PayApplication implements ApplicationRunner {
 	}
 
 	private void processProjectCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
-		if (update.message().text().equals("/add")) {
+		if (update.message().text().equals("/project")) {
 			bot.execute(new SendMessage(update.message().chat().id(),
-					"Для того, чтобы зарегистрировать нового разработчика, отправьте " +
-							"следующее сообщение с тремя элементами:\n\n" +
-							"<b>1.Команда new</b>\n<b>2.MerchantId</b>\n<b>3.SecretKey</b>\n\n" +
+					"Для того, чтобы создать новый проект, отправьте " +
+							"следующее сообщение с двумя элементами:\n\n" +
+							"<b>1.Команда project</b>\n<b>2.My First Project</b>\n\n" +
 							"<i>Обратите внимание, что каждый элемент должен начинаться " +
 							"с новой строки. Пример:</i>\n\n" +
-							"new\n384823903\n49308232").parseMode(ParseMode.HTML));
+							"project\nMy First Project\n").parseMode(ParseMode.HTML));
 		}
 	}
 
@@ -92,14 +115,16 @@ public class PayApplication implements ApplicationRunner {
 		}
 	}
 
-	private void processDeveloperCommand(TelegramBot bot, Update update) {
+	private void processAddDeveloperCommand(TelegramBot bot, Update update) {
 		// new message text
 		String message = update.message().text();
 
 		if (message.startsWith("developer\n")) {
 
-			User user = messageService.extractUser(message.substring(9));
+			User user = messageService.extractUser(message);
 			user.setTelegramId(update.message().chat().id().toString());
+
+			userService.save(user);
 
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Вы были успешно зарегистрированы.").parseMode(ParseMode.HTML));
