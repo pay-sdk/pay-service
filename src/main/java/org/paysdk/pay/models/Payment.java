@@ -20,6 +20,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String productId;
+
+    private String productName;
+
     private String username;
 
     private String description;
