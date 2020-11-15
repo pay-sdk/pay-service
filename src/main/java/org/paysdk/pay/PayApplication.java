@@ -13,6 +13,7 @@ import org.paysdk.pay.services.ProjectService;
 import org.paysdk.pay.services.UserService;
 import org.paysdk.pay.services.realizations.MessageService;
 import org.paysdk.pay.util.BotUtil;
+import org.paysdk.pay.util.NotifyUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -71,6 +72,9 @@ public class PayApplication implements ApplicationRunner {
 
 						// history
 						callbackHistoryCommand(bot, update);
+
+						// test
+						callbackTestPaymentCommand(bot, update);
 					}
 				});
 
@@ -80,6 +84,13 @@ public class PayApplication implements ApplicationRunner {
 			// ignore
 		}
 
+	}
+
+	private void callbackTestPaymentCommand(TelegramBot bot, Update update) {
+		if (update.message().text().equals("/test")) {
+
+			NotifyUtil.sendNotification("12121", update.message().chat().id().toString());
+		}
 	}
 
 	private void callbackGetAllProjectsByTelegramIdCommand(TelegramBot bot, Update update) {
