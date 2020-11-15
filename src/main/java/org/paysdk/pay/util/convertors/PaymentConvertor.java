@@ -8,6 +8,8 @@ public class PaymentConvertor {
 
     public static Payment convert(PaymentRequest paymentRequest) {
         return Payment.builder()
+                .productId(paymentRequest.getProductId())
+                .productName(paymentRequest.getProductName())
                 .username(paymentRequest.getUsername())
                 .description(paymentRequest.getDescription())
                 .moneyAmount(paymentRequest.getMoneyAmount())
@@ -16,6 +18,8 @@ public class PaymentConvertor {
 
     public static PaymentResponse convert(Payment payment) {
         return PaymentResponse.builder()
+                .productId(payment.getProductId())
+                .productName(payment.getProductName())
                 .username(payment.getUsername())
                 .description(payment.getDescription())
                 .moneyAmount(payment.getMoneyAmount())

@@ -9,6 +9,10 @@ public class PaymentRequest {
 
     private String token;
 
+    private String productId;
+
+    private String productName;
+
     private String username;
 
     private String description;

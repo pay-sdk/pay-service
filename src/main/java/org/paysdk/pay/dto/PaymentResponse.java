@@ -7,6 +7,10 @@ import lombok.Data;
 @Builder
 public class PaymentResponse {
 
+    private String productId;
+
+    private String productName;
+
     private String username;
 
     private String description;
