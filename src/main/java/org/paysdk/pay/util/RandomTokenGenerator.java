@@ -19,13 +19,13 @@ public class RandomTokenGenerator {
 
     private static final char[] buf = new char[20];
 
-//    public static String nextString() {
-//        for (int i = 0; i < buf.length; ++i)
-//            buf[i] = alphanum[random.nextInt(alphanum.length)];
-//        return new String(buf);
-//    }
-
     public static String nextString() {
-        return UUID.randomUUID().toString().replace("-", "");
+        for (int i = 0; i < buf.length; ++i)
+            buf[i] = alphanum[random.nextInt(alphanum.length)];
+        return new String(buf);
     }
+
+//    public static String nextString() {
+//        return UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+//    }
 }

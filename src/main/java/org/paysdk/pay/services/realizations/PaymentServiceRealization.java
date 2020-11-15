@@ -7,6 +7,8 @@ import org.paysdk.pay.services.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceRealization implements PaymentService {
@@ -17,5 +19,10 @@ public class PaymentServiceRealization implements PaymentService {
     @Override
     public Payment save(Payment payment) {
         return paymentRepository.save(payment);
+    }
+
+    @Override
+    public List<Payment> getAll() {
+        return paymentRepository.findAll();
     }
 }

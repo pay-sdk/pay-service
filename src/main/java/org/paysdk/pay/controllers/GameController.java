@@ -10,8 +10,12 @@ import org.paysdk.pay.dto.UserResponse;
 import org.paysdk.pay.services.PaymentService;
 import org.paysdk.pay.services.ProjectService;
 import org.paysdk.pay.services.UserService;
+import org.paysdk.pay.util.convertors.PaymentConvertor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.paysdk.pay.util.convertors.UserConvertor.*;
 import static org.paysdk.pay.util.convertors.PaymentConvertor.*;
@@ -45,5 +49,11 @@ public class GameController {
         payment.setProject(project);
         Payment savedPayment = paymentService.save(payment);
         return convert(savedPayment);
+    }
+
+    @GetMapping("/payments")
+    public List<PaymentResponse> getAllPayments() {
+        List<Payment> payments = paymentService.getAll();
+        return payments.stream().map(PaymentConvertor::convert).collect(Collectors.toList());
     }
 }
