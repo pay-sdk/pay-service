@@ -18,6 +18,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @AllArgsConstructor
 @SpringBootApplication
 public class PayApplication implements ApplicationRunner {
@@ -52,19 +54,22 @@ public class PayApplication implements ApplicationRunner {
 								"Добро пожаловать, " + update.message().from().firstName() + "!"));
 					} else {
 						// reg
-						processRegisterCommand(bot, update);
+						callbackRegisterCommand(bot, update);
 
 						// create developer
-						processAddDeveloperCommand(bot, update);
+						callbackAddDeveloperCommand(bot, update);
 
 						// project
-						processProjectCommand(bot, update);
+						callbackProjectCommand(bot, update);
 
 						// add project
 						processAddProjectCommand(bot, update);
 
+						// add project
+						callbackGetAllProjectsByTelegramIdCommand(bot, update);
+
 						// history
-						processHistoryCommand(bot, update);
+						callbackHistoryCommand(bot, update);
 					}
 				});
 
@@ -76,6 +81,28 @@ public class PayApplication implements ApplicationRunner {
 
 	}
 
+	private void callbackGetAllProjectsByTelegramIdCommand(TelegramBot bot, Update update) {
+		if (update.message().text().equals("/my")) {
+
+			List<Project> projects = projectService.findByTelegramId(update.message().chat().id().toString());
+
+			String projectsList = "";
+
+			if (projects != null && projects.size() > 0) {
+				for (Project project : projects) {
+					projectsList = project + "\n";
+				}
+
+				bot.execute(new SendMessage(update.message().chat().id(),
+						"<b>Ваши проекты:</b>\n" +
+								projectsList).parseMode(ParseMode.HTML));
+			} else {
+				bot.execute(new SendMessage(update.message().chat().id(),
+						"У вас нет проектов, пожалуйста добавьте с помощью /project.").parseMode(ParseMode.HTML));
+			}
+		}
+	}
+
 	private void processAddProjectCommand(TelegramBot bot, Update update) {
 		if (update.message().text().startsWith("project")) {
 
@@ -85,7 +112,8 @@ public class PayApplication implements ApplicationRunner {
 			if (userFromDb == null) {
 				bot.execute(new SendMessage(update.message().chat().id(),
 						"Вы не зарегистрированы как разработчик. Пожалуйста воспользуйтесь командой " +
-								"<b>/reg</b> для регистрации.").parseMode(ParseMode.HTML));
+								"<b>/reg</b> для регистрации. А чтобы посмотреть список проектов, наберите " +
+								"/my.").parseMode(ParseMode.HTML));
 				return;
 			}
 
@@ -99,7 +127,7 @@ public class PayApplication implements ApplicationRunner {
 		}
 	}
 
-	private void processRegisterCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
+	private void callbackRegisterCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
 		if (update.message().text().equals("/reg")) {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Для того, чтобы зарегистрировать нового разработчика, отправьте " +
@@ -112,7 +140,7 @@ public class PayApplication implements ApplicationRunner {
 		}
 	}
 
-	private void processProjectCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
+	private void callbackProjectCommand(TelegramBot bot, com.pengrad.telegrambot.model.Update update) {
 		if (update.message().text().equals("/project")) {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Для того, чтобы создать новый проект, отправьте " +
@@ -124,7 +152,7 @@ public class PayApplication implements ApplicationRunner {
 		}
 	}
 
-	private void processHistoryCommand(TelegramBot bot, Update update) {
+	private void callbackHistoryCommand(TelegramBot bot, Update update) {
 		if (update.message().text().equals("/history")) {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"<b>Платежи за последний месяц</b>\n" +
@@ -135,7 +163,7 @@ public class PayApplication implements ApplicationRunner {
 		}
 	}
 
-	private void processAddDeveloperCommand(TelegramBot bot, Update update) {
+	private void callbackAddDeveloperCommand(TelegramBot bot, Update update) {
 		// new message text
 		String message = update.message().text();
 

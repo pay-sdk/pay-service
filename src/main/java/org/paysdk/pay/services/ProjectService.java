@@ -1,12 +1,14 @@
 package org.paysdk.pay.services;
 
-import org.paysdk.pay.dto.ProjectRequest;
 import org.paysdk.pay.models.Project;
-import org.paysdk.pay.models.User;
+
+import java.util.List;
 
 public interface ProjectService {
 
     Project findByToken(String token);
+
+    List<Project> findByTelegramId(String telegramId);
 
     Project save(Project project);
 }
