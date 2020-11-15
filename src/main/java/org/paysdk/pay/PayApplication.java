@@ -104,26 +104,31 @@ public class PayApplication implements ApplicationRunner {
 	}
 
 	private void processAddProjectCommand(TelegramBot bot, Update update) {
-		if (update.message().text().startsWith("project")) {
 
-			Project project = messageService.extractProject(update.message().text());
-			User userFromDb = userService.findByTelegramId(update.message().chat().id().toString());
+		try {
+			if (update.message().text().startsWith("project")) {
 
-			if (userFromDb == null) {
+				Project project = messageService.extractProject(update.message().text());
+				User userFromDb = userService.findByTelegramId(update.message().chat().id().toString());
+
+				if (userFromDb == null) {
+					bot.execute(new SendMessage(update.message().chat().id(),
+							"Вы не зарегистрированы как разработчик. Пожалуйста воспользуйтесь командой " +
+									"<b>/reg</b> для регистрации. А чтобы посмотреть список проектов, наберите " +
+									"/my.").parseMode(ParseMode.HTML));
+					return;
+				}
+
+				project.setUser(userFromDb);
+				Project storedProject = projectService.save(project);
+
 				bot.execute(new SendMessage(update.message().chat().id(),
-						"Вы не зарегистрированы как разработчик. Пожалуйста воспользуйтесь командой " +
-								"<b>/reg</b> для регистрации. А чтобы посмотреть список проектов, наберите " +
-								"/my.").parseMode(ParseMode.HTML));
-				return;
+						"Проект " + storedProject.getName() + " готов.\n" +
+								"Ваш токен:\n\n" +
+								"<b>" + storedProject.getToken() + "</b>").parseMode(ParseMode.HTML));
 			}
-
-			project.setUser(userFromDb);
-			Project storedProject = projectService.save(project);
-
-			bot.execute(new SendMessage(update.message().chat().id(),
-					"Проект " + storedProject.getName() + " готов.\n" +
-							"Ваш токен:\n\n" +
-                            "<b>" + storedProject.getToken() + "</b>").parseMode(ParseMode.HTML));
+		} catch (Exception e) {
+			// ignore
 		}
 	}
 
@@ -167,21 +172,25 @@ public class PayApplication implements ApplicationRunner {
 		// new message text
 		String message = update.message().text();
 
-		if (message.startsWith("developer\n")) {
+		try {
+			if (message.startsWith("developer\n")) {
 
-			User user = messageService.extractUser(message);
-			user.setTelegramId(update.message().chat().id().toString());
+				User user = messageService.extractUser(message);
+				user.setTelegramId(update.message().chat().id().toString());
 
-			userService.save(user);
+				userService.save(user);
 
-			bot.execute(new SendMessage(update.message().chat().id(),
-					"Вы были успешно зарегистрированы как разработчик.\n" +
-							"Теперь вы можете создать свой проект для получения токена,\n" +
-							"используя команду /project.").parseMode(ParseMode.HTML));
+				bot.execute(new SendMessage(update.message().chat().id(),
+						"Вы были успешно зарегистрированы как разработчик.\n" +
+								"Теперь вы можете создать свой проект для получения токена,\n" +
+								"используя команду /project.").parseMode(ParseMode.HTML));
 
 //            bot.execute(new SendMessage(update.message().chat().id(),
 //                    "Ваш токен:\n\n" +
 //                            "<b>KLjdi89REb3894Fdbb8KJEosfd3f3Ie4</b>").parseMode(ParseMode.HTML));
+			}
+		} catch (Exception e) {
+			// ignore
 		}
 	}
 }
