@@ -13,5 +13,5 @@ public class PaymentRequest {
 
     private String description;
 
-    private Double moneyAmount;
+    private double moneyAmount;
 }
