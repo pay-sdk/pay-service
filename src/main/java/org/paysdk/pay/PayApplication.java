@@ -7,7 +7,9 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.AllArgsConstructor;
+import org.paysdk.pay.models.Project;
 import org.paysdk.pay.models.User;
+import org.paysdk.pay.services.ProjectService;
 import org.paysdk.pay.services.UserService;
 import org.paysdk.pay.services.realizations.MessageService;
 import org.springframework.boot.ApplicationArguments;
@@ -25,7 +27,7 @@ public class PayApplication implements ApplicationRunner {
 
 	private final MessageService messageService;
 	private final UserService userService;
-
+	private final ProjectService projectService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PayApplication.class, args);
@@ -34,49 +36,66 @@ public class PayApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 
-		TelegramBot bot = new TelegramBot("1417055143:AAEH2kYow1YW_VSble3_xFqJVQivjrOqk_w");
+		try {
 
-		bot.setUpdatesListener(updates -> {
-			updates.forEach(System.out::println);
+			TelegramBot bot = new TelegramBot("1417055143:AAEH2kYow1YW_VSble3_xFqJVQivjrOqk_w");
 
-			updates.forEach(update -> {
+			bot.setUpdatesListener(updates -> {
+				updates.forEach(System.out::println);
 
-				if (update.message() == null) return;
+				updates.forEach(update -> {
 
-				if (update.message().text().equals("/start")) {
-					bot.execute(new SendMessage(update.message().chat().id(),
-							"Добро пожаловать, " + update.message().from().firstName() + "!"));
-				} else {
-					// reg
-					processRegisterCommand(bot, update);
+					if (update.message() == null) return;
 
-					// create developer
-					processAddDeveloperCommand(bot, update);
+					if (update.message().text().equals("/start")) {
+						bot.execute(new SendMessage(update.message().chat().id(),
+								"Добро пожаловать, " + update.message().from().firstName() + "!"));
+					} else {
+						// reg
+						processRegisterCommand(bot, update);
 
-					// project
-					processProjectCommand(bot, update);
+						// create developer
+						processAddDeveloperCommand(bot, update);
 
-					// add project
-					processAddProjectCommand(bot, update);
+						// project
+						processProjectCommand(bot, update);
 
-					// history
-					processHistoryCommand(bot, update);
-				}
+						// add project
+						processAddProjectCommand(bot, update);
+
+						// history
+						processHistoryCommand(bot, update);
+					}
+				});
+
+				return UpdatesListener.CONFIRMED_UPDATES_ALL;
 			});
-
-			// TODO: implement it
-
-			return UpdatesListener.CONFIRMED_UPDATES_ALL;
-		});
+		} catch (Exception e) {
+			// ignore
+		}
 
 	}
 
 	private void processAddProjectCommand(TelegramBot bot, Update update) {
 		if (update.message().text().startsWith("project")) {
+
+			Project project = messageService.extractProject(update.message().text());
+			User userFromDb = userService.findByTelegramId(update.message().chat().id().toString());
+
+			if (userFromDb == null) {
+				bot.execute(new SendMessage(update.message().chat().id(),
+						"Вы не зарегистрированы как разработчик. Пожалуйста воспользуйтесь командой " +
+								"<b>/reg</b> для регистрации.").parseMode(ParseMode.HTML));
+				return;
+			}
+
+			project.setUser(userFromDb);
+			Project storedProject = projectService.save(project);
+
 			bot.execute(new SendMessage(update.message().chat().id(),
-					"Проект готов.\n" +
+					"Проект " + storedProject.getName() + " готов.\n" +
 							"Ваш токен:\n\n" +
-                            "<b>KLjdi89REb3894Fdbb8KJEosfd3f3Ie4</b>").parseMode(ParseMode.HTML));
+                            "<b>" + storedProject.getToken() + "</b>").parseMode(ParseMode.HTML));
 		}
 	}
 
@@ -85,7 +104,8 @@ public class PayApplication implements ApplicationRunner {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Для того, чтобы зарегистрировать нового разработчика, отправьте " +
 							"следующее сообщение с тремя элементами:\n\n" +
-							"<b>1.Слово developer</b>\n<b>2.MerchantId</b>\n<b>3.SecretKey</b>\n\n" +
+							"<b>developer</b> - кодовое слово\n<b>MerchantId</b> - Идентификатор продавца" +
+							"\n<b>SecretKey</b> - секретный ключ\n\n" +
 							"<i>Обратите внимание, что каждый элемент должен начинаться " +
 							"с новой строки. Пример:</i>\n\n" +
 							"developer\n384823903\n49308232").parseMode(ParseMode.HTML));
@@ -97,7 +117,7 @@ public class PayApplication implements ApplicationRunner {
 			bot.execute(new SendMessage(update.message().chat().id(),
 					"Для того, чтобы создать новый проект, отправьте " +
 							"следующее сообщение с двумя элементами:\n\n" +
-							"<b>1.Команда project</b>\n<b>2.My First Project</b>\n\n" +
+							"<b>project</b> - кодовое слво\n<b>My First Project</b> - название проекта\n\n" +
 							"<i>Обратите внимание, что каждый элемент должен начинаться " +
 							"с новой строки. Пример:</i>\n\n" +
 							"project\nMy First Project\n").parseMode(ParseMode.HTML));
@@ -127,7 +147,9 @@ public class PayApplication implements ApplicationRunner {
 			userService.save(user);
 
 			bot.execute(new SendMessage(update.message().chat().id(),
-					"Вы были успешно зарегистрированы.").parseMode(ParseMode.HTML));
+					"Вы были успешно зарегистрированы как разработчик.\n" +
+							"Теперь вы можете создать свой проект для получения токена,\n" +
+							"используя команду /project.").parseMode(ParseMode.HTML));
 
 //            bot.execute(new SendMessage(update.message().chat().id(),
 //                    "Ваш токен:\n\n" +
