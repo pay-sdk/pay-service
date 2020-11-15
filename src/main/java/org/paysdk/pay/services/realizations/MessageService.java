@@ -1,18 +1,19 @@
 package org.paysdk.pay.services.realizations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.paysdk.pay.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     public User extractUser(String message) {
-        // TODO extract user from string
-        return objectMapper.convertValue(message, User.class);
+        String[] strings = message.split("\n");
+        if (strings.length != 2) {
+            throw new IllegalArgumentException();
+        }
+        return User.builder()
+                .merchantId(strings[0])
+                .secretKey(strings[1])
+                .build();
     }
 }
