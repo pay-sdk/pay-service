@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.paysdk.pay.models.Payment;
 import org.paysdk.pay.repositories.PaymentRepository;
 import org.paysdk.pay.services.PaymentService;
+import org.paysdk.pay.util.BotUtil;
+import org.paysdk.pay.util.NotifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class PaymentServiceRealization implements PaymentService {
 
     @Override
     public Payment save(Payment payment) {
+
+        NotifyUtil.sendNotification();
+
         return paymentRepository.save(payment);
     }
 

@@ -20,11 +20,14 @@ public class UserServiceRealizations implements UserService {
     @Override
     public User save(User user) {
         User savedUser;
+        // update
         if ((savedUser = userRepository.findByTelegramId(user.getTelegramId())) != null) {
             savedUser.setMerchantId(user.getMerchantId());
             savedUser.setSecretKey(user.getSecretKey());
+            savedUser.setTelegramId(user.getTelegramId());
             return userRepository.save(savedUser);
         }
+        // save
         return userRepository.save(user);
     }
 

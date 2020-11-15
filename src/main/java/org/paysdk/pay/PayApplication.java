@@ -31,6 +31,8 @@ public class PayApplication implements ApplicationRunner {
 	private final UserService userService;
 	private final ProjectService projectService;
 
+	private final TelegramBot bot = new TelegramBot("1417055143:AAEH2kYow1YW_VSble3_xFqJVQivjrOqk_w");
+
 	public static void main(String[] args) {
 		SpringApplication.run(PayApplication.class, args);
 	}
@@ -39,8 +41,6 @@ public class PayApplication implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 
 		try {
-
-			TelegramBot bot = new TelegramBot("1417055143:AAEH2kYow1YW_VSble3_xFqJVQivjrOqk_w");
 
 			bot.setUpdatesListener(updates -> {
 				updates.forEach(System.out::println);
@@ -73,7 +73,7 @@ public class PayApplication implements ApplicationRunner {
 					}
 				});
 
-				return UpdatesListener.CONFIRMED_UPDATES_ALL;
+				return UpdatesListener.CONFIRMED_UPDATES_NONE;
 			});
 		} catch (Exception e) {
 			// ignore
@@ -95,7 +95,7 @@ public class PayApplication implements ApplicationRunner {
 
 				bot.execute(new SendMessage(update.message().chat().id(),
 						"<b>Ваши проекты:</b>\n" +
-								projectsList).parseMode(ParseMode.HTML));
+								projectsList.toString()).parseMode(ParseMode.HTML));
 			} else {
 				bot.execute(new SendMessage(update.message().chat().id(),
 						"У вас нет проектов, пожалуйста добавьте с помощью /project.").parseMode(ParseMode.HTML));
@@ -172,12 +172,13 @@ public class PayApplication implements ApplicationRunner {
 		// new message text
 		String message = update.message().text();
 
-		try {
 			if (message.startsWith("developer\n")) {
 
 				User user = messageService.extractUser(message);
+				System.out.println(update.message().chat().id().toString());
 				user.setTelegramId(update.message().chat().id().toString());
 
+				System.out.println(user.toString());
 				userService.save(user);
 
 				bot.execute(new SendMessage(update.message().chat().id(),
@@ -189,8 +190,6 @@ public class PayApplication implements ApplicationRunner {
 //                    "Ваш токен:\n\n" +
 //                            "<b>KLjdi89REb3894Fdbb8KJEosfd3f3Ie4</b>").parseMode(ParseMode.HTML));
 			}
-		} catch (Exception e) {
-			// ignore
-		}
+
 	}
 }
