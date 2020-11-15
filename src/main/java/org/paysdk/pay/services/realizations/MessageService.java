@@ -8,12 +8,12 @@ public class MessageService {
 
     public User extractUser(String message) {
         String[] strings = message.split("\n");
-        if (strings.length != 2) {
+        if (strings.length != 3) {
             throw new IllegalArgumentException();
         }
         return User.builder()
-                .merchantId(strings[0])
-                .secretKey(strings[1])
+                .merchantId(strings[1])
+                .secretKey(strings[2])
                 .build();
     }
 }
