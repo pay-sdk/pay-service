@@ -24,10 +24,8 @@ public class User {
     @Column(unique = true)
     private String telegramId;
 
-    @Column(unique = true)
     private String merchantId;
 
-    @Column(unique = true)
     private String secretKey;
 
     @Type(type="date")
